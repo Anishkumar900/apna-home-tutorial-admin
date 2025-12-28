@@ -2,13 +2,12 @@ package com.admin.controller;
 
 
 import com.admin.model.Admin;
+import com.admin.request.Login;
 import com.admin.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +24,11 @@ public class AuthController {
     @PostMapping("/registration-verify")
     public ResponseEntity<String> registrationVerify(@RequestBody Admin admin){
         return ResponseEntity.ok(authService.verifyRegister(admin));
+    }
+
+
+    @GetMapping("/login")
+    public ResponseEntity<String> login(@RequestBody Login login){
+        return ResponseEntity.ok(authService.login(login));
     }
 }

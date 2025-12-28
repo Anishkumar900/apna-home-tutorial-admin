@@ -8,6 +8,7 @@ import com.admin.exception.UserAlreadyExistException;
 import com.admin.exception.UserNotFoundException;
 import com.admin.model.Admin;
 import com.admin.repository.AdminRepository;
+import com.admin.request.Login;
 import com.admin.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -89,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login() {
+    public String login(Login login) {
         return "";
     }
 }
