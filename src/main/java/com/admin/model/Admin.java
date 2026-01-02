@@ -1,10 +1,8 @@
 package com.admin.model;
 
 import com.admin.dom.VerifyAdmin;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,12 +17,19 @@ import java.time.LocalDateTime;
 @Setter
 public class Admin {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    @Column(nullable = false, unique = true)
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String otp;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime expireOtpTime;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime createdAt;
     @Enumerated(EnumType.STRING)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private VerifyAdmin verifyAdmin;
 }

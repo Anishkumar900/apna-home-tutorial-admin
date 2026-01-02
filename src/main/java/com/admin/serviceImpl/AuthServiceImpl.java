@@ -1,8 +1,10 @@
 package com.admin.serviceImpl;
 
+import com.admin.config.JWTService;
 import com.admin.dom.VerifyAdmin;
 import com.admin.dto.EmailModifier;
 import com.admin.dto.OTPGenerate;
+import com.admin.emailService.EmailSenderOtp;
 import com.admin.exception.AdminSaveException;
 import com.admin.exception.UserAlreadyExistException;
 import com.admin.exception.UserNotFoundException;
@@ -25,6 +27,9 @@ public class AuthServiceImpl implements AuthService {
 
     private final AdminRepository adminRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JWTService jwtService;
+
+    private final EmailSenderOtp emailSenderOtp;
 
     @Override
     public String registerAdmin(Admin admin) throws IllegalAccessException {
@@ -41,12 +46,13 @@ public class AuthServiceImpl implements AuthService {
             adminRepository.delete(existing.get());
         }
 
+        emailSenderOtp.sendOtpEmail("apnahometutorial@gmail.com","Admin",otp);
+
         admin.setPassword(bCryptPasswordEncoder.encode(admin.getPassword()));
         admin.setVerifyAdmin(VerifyAdmin.PENDING);
         admin.setOtp(otp);
         admin.setCreatedAt(LocalDateTime.now());
         admin.setExpireOtpTime(LocalDateTime.now().plusMinutes(15));
-
         try {
             adminRepository.save(admin);
             return "Please verify!";
@@ -91,6 +97,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(Login login) {
-        return "";
+        String email = EmailModifier.emailRewrite(login.getEmail());
+        login.setEmail(EmailModifier.emailRewrite(login.getEmail()));
+
+        Admin admin=adminRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found!"));
+
+        if(admin.getVerifyAdmin() != VerifyAdmin.VERIFIED){
+            throw new UserNotFoundException("User not found!");
+        }
+        if (!bCryptPasswordEncoder.matches(login.getPassword(), admin.getPassword())) {
+            throw new BadCredentialsException("Invalid email or password!");
+        }
+        return jwtService.generateJWTToken(email);
     }
 }
